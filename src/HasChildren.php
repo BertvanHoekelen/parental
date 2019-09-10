@@ -14,11 +14,12 @@ trait HasChildren
     {
         parent::registerModelEvent($event, $callback);
 
-        if (static::class === self::class && property_exists(self::class, 'childTypes')) {
+        $childTypes = (new self)->getChildTypes();
+
+        if (static::class === self::class && count($childTypes)) {
             // We don't want to register the callbacks that happen in the boot method of the parent, as they'll be called
             // from the child's boot method as well.
             if (! self::parentIsBooting()) {
-                foreach ((new self)->childTypes as $childClass) {
                     if ($childClass !== self::class) {
                         $childClass::registerModelEvent($event, $callback);
                     }
